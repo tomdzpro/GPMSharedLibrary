@@ -1,7 +1,6 @@
 ﻿# API GPM BROWSER
 ## Download driver and browser
-[Download](https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing).
-[Video guide](https://youtu.be/xP6K-nl5xsU)
+[Download Browser](https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing) and view [Video guide](https://youtu.be/l4Cj9hKma5Q)
 
 ## Sample
 ```bash

@@ -1,10 +1,10 @@
 ﻿# API GPM BROWSER
 ## Download driver and browser
-[Download](https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing).
+[Download Browser](https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing) and view [Video guide](https://youtu.be/l4Cj9hKma5Q)
 
 ## Sample
 ```bash
-# Step 1: Init fake hardware info
+// Step 1: Init fake hardware info
 Random _rand = new Random();
 ProfileInfo profileInfo = new ProfileInfo();
 
@@ -33,13 +33,13 @@ profileInfo.WebRTC.Mode = WebRTCMode.Disable;
 // Step 2: Set key GPM
 profileInfo.GPMKey = "Enter key here";
 
-# Step 3: Init profile folder, path to chrome.exe and port remote chrome
+// Step 3: Init profile folder, path to chrome.exe and port remote chrome
 string gpmBrowserPath = @"D:\Codes\chromium\src\out\Minimum\chrome.exe";
 string profilePath = @"D:\Codes\chromium-test-file\profiles\test-ronin";
 int portRemote = 9951;
 
-# Step 4: Start browser and remote
-ChromeDriver driver = GPMLogin.GPMStarter.StartProfile(gpmBrowserPath, profilePath, portRemote, profileInfo, "--enabled");
+// Step 4: Start browser and remote
+ChromeDriver driver = GPMLogin.GPMStarter.StartProfile(gpmBrowserPath, profilePath, portRemote, profileInfo, "--enabled", hideConsole: false);
 
 driver.Navigate().GoToUrl("http://codethuegiare.com/download");
 
