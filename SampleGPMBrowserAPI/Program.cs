@@ -43,7 +43,7 @@ namespace SampleGPMBrowserAPI
             profileInfo.WebRTC.Mode = WebRTCMode.Real;
             //profileInfo.Proxy = "103.155.217.247:32865"; // "socks5://1.2.3.4:567"
             // Step 2: Set key GPM
-            profileInfo.GPMKey = "X1S75QPYIHK";
+            profileInfo.GPMKey = "Enter code here";
 
             // Step 3: Init profile folder, path to chrome.exe and port remote chrome
             string gpmBrowserPath = @"D:\Codes\chromium\src\out\Release\chrome.exe"; //https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing
