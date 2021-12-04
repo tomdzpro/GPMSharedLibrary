@@ -3,6 +3,7 @@ using GPMSharedLibrary.Models;
 using Newtonsoft.Json;
 using OpenQA.Selenium.Chrome;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -21,10 +22,10 @@ namespace GPMLogin
         /// <param name="profileInfo"></param>
         /// <param name="fileNameDriver"></param>
         /// <param name="delayReturn">Delay before return (depend on hardware fast)</param>
-        /// <param name="customFlag"></param>
+        /// <param name="customFlags"></param>
         /// <param name="hideConsole"></param>
         /// <returns></returns>
-        public static ChromeDriver StartProfile(string browserExePath, string profilePath, int remotePort, ProfileInfo profileInfo, string customFlag = null, string fileNameDriver= "gpmdriver.exe", int delayReturn=1000, bool hideConsole=true)
+        public static ChromeDriver StartProfile(string browserExePath, string profilePath, int remotePort, ProfileInfo profileInfo, List<string> customFlags = null, List<string> extensions = null, string fileNameDriver= "gpmdriver.exe", int delayReturn=1000, bool hideConsole=true, string startUrl=null)
         {
             //kiểm tra đầu vào
             if (string.IsNullOrEmpty(profileInfo?.GPMKey))
@@ -37,17 +38,29 @@ namespace GPMLogin
             //Bước 2: Tạo/ghi đè file GPM
             if (!Directory.Exists(Path.Combine(profilePath, "Default")))
                 Directory.CreateDirectory(Path.Combine(profilePath, "Default"));
-            WriteGPMFile(profilePath, profileInfo);
-            if (!File.Exists(profilePath + "\\Default\\gpm"))
-                throw new Exception($"{profilePath}\\Default\\gpm file not found.");
+            WriteGPMFile(profilePath, profileInfo, profileInfo.ConfigName);
+            if (!File.Exists(profilePath + $"\\Default\\{profileInfo.ConfigName}"))
+                throw new Exception($"{profilePath}\\Default\\{profileInfo.ConfigName} file not found.");
 
-            //Bước 3: Copy thư mục extension
-            CopyCookieExtension(profilePath);
-            string cookieExtensionPath = Path.Combine(profilePath, "BrowserExtensions", "cookies-ext");
+            //Bước 4: Chuẩn bị param khởi động chrome
+            List<string> parmas = new List<string>();
+            parmas.Add($"--user-data-dir=\"{profilePath}\"");
+            parmas.Add($"--lang={profileInfo.AcceptLanguage}");
+            parmas.Add($"--disable-encryption");
+            parmas.Add($"--user-agent=\"{profileInfo.UserAgent}\"");
+            parmas.Add($"--no-default-browser-check");
+            parmas.Add($"--uniform2f-noise={profileInfo.WebGLUniform2fNoise}");
+            parmas.Add($"--max-vertex-uniform={profileInfo.MaxVertexUniform}");
+            parmas.Add($"--max-fragment-uniform={profileInfo.MaxFragmentUniform}");
+            parmas.Add($"--config-name={profileInfo.ConfigName}");
+            if (!string.IsNullOrEmpty(profileInfo.WebGLVendor))
+                parmas.Add($"--webgl-vendor=\"{profileInfo.WebGLVendor}\"");
+            if (!string.IsNullOrEmpty(profileInfo.WebGLRender))
+                parmas.Add($"--webgl-renderer=\"{profileInfo.WebGLRender}\"");
 
-            //Bước 4: Khởi động Chrome
-            string param = $"--user-data-dir=\"{profilePath}\" --lang={profileInfo.AcceptLanguage} --disable-encryption --user-agent=\"{profileInfo.UserAgent}\" --no-default-browser-check --uniform2f-noise={profileInfo.WebGLUniform2fNoise} --load-extension=\"{cookieExtensionPath}\" --max-vertex-uniform={profileInfo.MaxVertexUniform} --max-fragment-uniform={profileInfo.MaxFragmentUniform}";
-            
+            if (extensions != null && extensions.Count > 0)
+                parmas.Add($"--load-extension=\"{string.Join(",", extensions)}\"");
+
             if (!string.IsNullOrEmpty(profileInfo.Proxy))
             {
                 ProxyInfo proxyInfo = new ProxyInfo(profileInfo.Proxy);
@@ -55,12 +68,17 @@ namespace GPMLogin
                 if (proxyInfo.Type == "Socks 5") proxyParam = $" --proxy-server=socks5://{proxyInfo.Host}:{proxyInfo.Port}";
                 else if (proxyInfo.Type == "Socks 4") proxyParam = $" --proxy-server=socks://{proxyInfo.Host}:{proxyInfo.Port}";
 
-                param += $" {proxyParam}";
+                parmas.Add($"{proxyParam}");
             }
-            if (!string.IsNullOrEmpty(customFlag))
-                param += " " + customFlag.Trim();
+            if (customFlags != null && customFlags.Count > 0)
+                parmas.AddRange(customFlags);
 
-            param += $" --remote-debugging-port={remotePort}";
+            parmas.Add($"--remote-debugging-port={remotePort}");
+            if (!string.IsNullOrEmpty(startUrl))
+                parmas.Add(startUrl);
+
+            string param = string.Join(" ", parmas);
+
             Process.Start(browserExePath, param);
 
             Thread.Sleep(delayReturn);
@@ -76,7 +94,7 @@ namespace GPMLogin
             return driver;
         }
 
-        static void WriteGPMFile(string profilePath, ProfileInfo profileInfo)
+        static void WriteGPMFile(string profilePath, ProfileInfo profileInfo, string configName)
         {
             try
             {
@@ -89,7 +107,7 @@ namespace GPMLogin
                 using (JsonWriter writer = new JsonTextWriter(sw))
                 {
                     writer.WriteStartObject();
-                    writer.WritePropertyName("gpm");
+                    writer.WritePropertyName(configName);
                     writer.WriteStartObject();
 
                     // Name
@@ -212,7 +230,7 @@ namespace GPMLogin
                     writer.WriteEndObject();
                 }
 
-                File.WriteAllText(Path.Combine(profilePath, "Default", "gpm"), sb.ToString());
+                File.WriteAllText(Path.Combine(profilePath, "Default", configName), sb.ToString());
             }
             catch (Exception ex)
             {

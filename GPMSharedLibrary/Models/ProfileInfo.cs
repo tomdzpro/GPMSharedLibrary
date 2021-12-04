@@ -10,6 +10,10 @@ namespace GPMSharedLibrary.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        /// <summary>
+        /// Custom file Config name and property name in file config. Default is "gpm"
+        /// </summary>
+        public string ConfigName { get; set; } = "gpm";
 
         public string GPMKey { get; set; }
 
@@ -65,6 +69,9 @@ namespace GPMSharedLibrary.Models
         /// Range: 0.0001 -> 0.0999
         /// </summary>
         public double WebGLRectNoise { get; set; } = -1;
+
+        public string WebGLVendor { get; set; }
+        public string WebGLRender { get; set; }
         /// <summary>
         /// Not set: -1
         /// Range: 0.001 -> 0.199 (total 4 number. Eg error 0.0001)
