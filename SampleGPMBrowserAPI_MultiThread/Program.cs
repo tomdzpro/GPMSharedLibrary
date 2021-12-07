@@ -65,7 +65,7 @@ namespace SampleGPMBrowserAPI_MultiThread
             profileInfo.WebRTC.Mode = WebRTCMode.Real;
             //profileInfo.Proxy = "103.155.217.247:32865"; // "socks5://1.2.3.4:567"
             // Step 2: Set key GPM
-            profileInfo.GPMKey = "X1S75QPYIHK";
+            profileInfo.GPMKey = "Enter code here";
 
             return profileInfo;
         }
