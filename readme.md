@@ -1,8 +1,8 @@
 ﻿# API GPM BROWSER
 ## Download driver and browser
-[Download Browser](https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing)
-<br /> [Video guide remote single thread](https://youtu.be/l4Cj9hKma5Q)
-<br /> [Video guide remote multi thread](https://youtu.be/9_3eyWuAXz0)
+1. [Download Browser](https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing)
+<br /> 2. [Video guide remote single thread](https://youtu.be/l4Cj9hKma5Q)
+<br /> 3. [Video guide remote multi thread](https://youtu.be/9_3eyWuAXz0)
 <br />Contacts: [ngochoaitn@gmail.com](mailto:ngochoaitn@gmail.com) or [Facebook](https://facebook.com/ngochoaitn)
 
 ## Sample
