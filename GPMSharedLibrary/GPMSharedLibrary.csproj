@@ -51,17 +51,50 @@
   <ItemGroup>
     <Compile Include="GPMStarter.cs" />
     <Compile Include="Helpers\DeepCopy.cs" />
+    <Compile Include="Helpers\SimpleServer.cs" />
     <Compile Include="Models\IPInfo.cs" />
     <Compile Include="Models\ProfileInfo.cs" />
     <Compile Include="Models\ProxyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BrowserExtensions\cookies-ext\gpm_cmd.example.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BrowserExtensions\cookies-ext\gpm_cmd.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BrowserExtensions\cookies-ext\gpm_restore_cookie.example.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BrowserExtensions\cookies-ext\manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="gpmdriver.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BrowserExtensions\cookies-ext\background.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="BrowserExtensions\cookies-ext\background.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="BrowserExtensions\cookies-ext\icons\icon128.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BrowserExtensions\cookies-ext\icons\icon16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BrowserExtensions\cookies-ext\icons\icon256.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BrowserExtensions\cookies-ext\icons\icon48.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

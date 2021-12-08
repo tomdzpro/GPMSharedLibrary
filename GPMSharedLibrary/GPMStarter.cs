@@ -25,55 +25,62 @@ namespace GPMLogin
         /// <param name="customFlags"></param>
         /// <param name="hideConsole"></param>
         /// <returns></returns>
-        public static ChromeDriver StartProfile(string browserExePath, string profilePath, int remotePort, ProfileInfo profileInfo, List<string> customFlags = null, List<string> extensions = null, string fileNameDriver= "gpmdriver.exe", int delayReturn=1000, bool hideConsole=true, string startUrl=null)
+        public static ChromeDriver StartProfile(string browserExePath, ProfileInfo profileInfo, string fileNameDriver= "gpmdriver.exe", int delayReturn=1000, bool hideConsole=true, string startUrl=null)
         {
-            //kiểm tra đầu vào
+            // Check params
             if (string.IsNullOrEmpty(profileInfo?.GPMKey))
                 throw new Exception("profileInfo.GPMKey null or empty");
+            if(string.IsNullOrEmpty(profileInfo?.ProfilePath))
+                throw new Exception("Must be set profile path");
 
-            //Bước 1: Tạo thư mục profile
-            if (!Directory.Exists(profilePath))
-                Directory.CreateDirectory(profilePath);
+            //Step 1: Create folder profile
+            if (!Directory.Exists(profileInfo.ProfilePath))
+                Directory.CreateDirectory(profileInfo.ProfilePath);
 
-            //Bước 2: Tạo/ghi đè file GPM
-            if (!Directory.Exists(Path.Combine(profilePath, "Default")))
-                Directory.CreateDirectory(Path.Combine(profilePath, "Default"));
-            WriteGPMFile(profilePath, profileInfo, profileInfo.ConfigName);
-            if (!File.Exists(profilePath + $"\\Default\\{profileInfo.ConfigName}"))
-                throw new Exception($"{profilePath}\\Default\\{profileInfo.ConfigName} file not found.");
+            //Step 2: Override file gpm
+            if (!Directory.Exists(Path.Combine(profileInfo.ProfilePath, "Default")))
+                Directory.CreateDirectory(Path.Combine(profileInfo.ProfilePath, "Default"));
+            WriteGPMFile(profileInfo.ProfilePath, profileInfo, profileInfo.ConfigName);
 
-            //Bước 4: Chuẩn bị param khởi động chrome
+            if (!File.Exists(profileInfo.ProfilePath + $"\\Default\\{profileInfo.ConfigName}"))
+                throw new Exception($"{profileInfo.ProfilePath}\\Default\\{profileInfo.ConfigName} file not found.");
+
+            //Step 3: set params to gpm browser
             List<string> parmas = new List<string>();
-            parmas.Add($"--user-data-dir=\"{profilePath}\"");
-            parmas.Add($"--lang={profileInfo.AcceptLanguage}");
+            parmas.Add($"--user-data-dir=\"{profileInfo.ProfilePath}\"");
             parmas.Add($"--disable-encryption");
             parmas.Add($"--user-agent=\"{profileInfo.UserAgent}\"");
             parmas.Add($"--no-default-browser-check");
             parmas.Add($"--uniform2f-noise={profileInfo.WebGLUniform2fNoise}");
             parmas.Add($"--max-vertex-uniform={profileInfo.MaxVertexUniform}");
             parmas.Add($"--max-fragment-uniform={profileInfo.MaxFragmentUniform}");
-            parmas.Add($"--config-name={profileInfo.ConfigName}");
+
+            if (!string.IsNullOrEmpty(profileInfo.AcceptLanguage))
+                parmas.Add($"--lang={profileInfo.AcceptLanguage}");
+            if (!string.IsNullOrEmpty(profileInfo.ConfigName))
+                parmas.Add($"--config-name={profileInfo.ConfigName}");
             if (!string.IsNullOrEmpty(profileInfo.WebGLVendor))
                 parmas.Add($"--webgl-vendor=\"{profileInfo.WebGLVendor}\"");
             if (!string.IsNullOrEmpty(profileInfo.WebGLRender))
                 parmas.Add($"--webgl-renderer=\"{profileInfo.WebGLRender}\"");
 
-            if (extensions != null && extensions.Count > 0)
-                parmas.Add($"--load-extension=\"{string.Join(",", extensions)}\"");
+            if (profileInfo.Extensions != null && profileInfo.Extensions.Count > 0)
+                parmas.Add($"--load-extension=\"{string.Join(",", profileInfo.Extensions)}\"");
 
             if (!string.IsNullOrEmpty(profileInfo.Proxy))
             {
                 ProxyInfo proxyInfo = new ProxyInfo(profileInfo.Proxy);
-                string proxyParam = $" --proxy-server={proxyInfo.Host}:{proxyInfo.Port}";
-                if (proxyInfo.Type == "Socks 5") proxyParam = $" --proxy-server=socks5://{proxyInfo.Host}:{proxyInfo.Port}";
-                else if (proxyInfo.Type == "Socks 4") proxyParam = $" --proxy-server=socks://{proxyInfo.Host}:{proxyInfo.Port}";
+                string proxyParam = $"--proxy-server={proxyInfo.Host}:{proxyInfo.Port}";
+                if (proxyInfo.Type == "Socks 5") proxyParam = $"--proxy-server=socks5://{proxyInfo.Host}:{proxyInfo.Port}";
+                else if (proxyInfo.Type == "Socks 4") proxyParam = $"--proxy-server=socks://{proxyInfo.Host}:{proxyInfo.Port}";
 
                 parmas.Add($"{proxyParam}");
             }
-            if (customFlags != null && customFlags.Count > 0)
-                parmas.AddRange(customFlags);
 
-            parmas.Add($"--remote-debugging-port={remotePort}");
+            if (profileInfo.CustomFlags != null && profileInfo.CustomFlags.Count > 0)
+                parmas.AddRange(profileInfo.CustomFlags);
+
+            parmas.Add($"--remote-debugging-port={profileInfo.RemotePort}");
             if (!string.IsNullOrEmpty(startUrl))
                 parmas.Add(startUrl);
 
@@ -87,7 +94,7 @@ namespace GPMLogin
             ChromeDriverService service = ChromeDriverService.CreateDefaultService(AppDomain.CurrentDomain.BaseDirectory, fileNameDriver);
             service.HideCommandPromptWindow = hideConsole;
             ChromeOptions options = new ChromeOptions();
-            options.DebuggerAddress = "127.0.0.1:" + remotePort;
+            options.DebuggerAddress = "127.0.0.1:" + profileInfo.RemotePort;
             
             ChromeDriver driver = new ChromeDriver(service, options);
 

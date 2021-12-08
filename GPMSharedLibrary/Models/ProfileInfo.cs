@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using GPMSharedLibrary.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Text;
 
@@ -14,6 +16,10 @@ namespace GPMSharedLibrary.Models
         /// Custom file Config name and property name in file config. Default is "gpm"
         /// </summary>
         public string ConfigName { get; set; } = "gpm";
+
+        public string ProfilePath { get; set; }
+
+        public ushort RemotePort { get; set; }
 
         public string GPMKey { get; set; }
 
@@ -91,14 +97,24 @@ namespace GPMSharedLibrary.Models
         /// </summary>
         public int MaxFragmentUniform {get; set; }
 
+        // Other setting
+        public List<string> CustomFlags { get; set; }
+        public List<string> Extensions { get; set; }
+
         public WebRTC WebRTC { get; set; } = new WebRTC();
 
         public ProfileInfo()
         {
+            Random _rand = new Random();
+
             // Default data
             this.ExcludeFontList = new List<string>();
             this.AcceptLanguage = "en-US";
-            this.Timezone = "America/New_York";
+            this.Timezone = "Asia/Bangkok";
+            this.CustomFlags = new List<string>();
+            this.Extensions = new List<string>();
+
+            this.RemotePort = (ushort)_rand.Next(6000, 9000);
         }
 
         public void ParseFromGPMFile(string file)
@@ -125,6 +141,51 @@ namespace GPMSharedLibrary.Models
 
             this.MaxFragmentUniform = Convert.ToInt32(jsonObj.gpm.advance.maxFragmentUniform);
             this.MaxVertexUniform = Convert.ToInt32(jsonObj.gpm.advance.maxVertexUniform);
+        }
+
+        public string CopyCookieExtension()
+        {
+            try
+            {
+                string dirPath = Path.Combine(this.ProfilePath, "Default", "GPMBrowserExtenions", "cookies-ext");
+                if (!Directory.Exists(dirPath))
+                    Directory.CreateDirectory(dirPath);
+                DeepCopy.DirectoryCopy(new DirectoryInfo("BrowserExtensions\\cookies-ext"), new DirectoryInfo(dirPath));
+
+                this.ConfigGpmCommandToCookieExtension("");
+
+                return dirPath;
+            }
+            catch 
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="profileInfo"></param>
+        /// <param name="command"></param>
+        private void ConfigGpmCommandToCookieExtension(string command)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(this.Id))
+                    throw new Exception("profile id is null or emplty");
+                string cookieExtensionPath = Path.Combine(this.ProfilePath, "Default", "GPMBrowserExtenions", "cookies-ext");
+                if (!Directory.Exists(cookieExtensionPath))
+                    throw new Exception("Folder cookie-extension not exits");
+                string gpmCommandFile = Path.Combine(cookieExtensionPath, "gpm_cmd.json");
+                string pathFileCookie = Path.Combine(cookieExtensionPath, "gpm_restore_cookie.json");
+                dynamic gpmCommand = new ExpandoObject();
+                gpmCommand.gpm_profile_id = this.Id;
+                gpmCommand.command = command;
+                gpmCommand.url_server = $"http://127.0.0.1:{GPMSimpleHttpServer.PORT}";
+                gpmCommand.file_cookie_save = pathFileCookie;
+                File.WriteAllText(gpmCommandFile, JsonConvert.SerializeObject(gpmCommand));
+            }
+            catch { }
         }
     }
 

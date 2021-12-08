@@ -39,10 +39,13 @@ namespace SampleGPMBrowserAPI_MultiThread
             Random _rand = new Random();
             ProfileInfo profileInfo = new ProfileInfo();
 
-            profileInfo.Name = "Ronin-Facebook";
-            profileInfo.ConfigName = "ronin";
+            profileInfo.ProfilePath = @"D:\Codes\chromium-test-file\profiles\test-profile";
+            profileInfo.RemotePort = 9001;
 
-            profileInfo.BrowseVersion = "93.0.4577.100";
+            profileInfo.Name = "Test profile";
+            profileInfo.ConfigName = "test";
+
+            profileInfo.BrowseVersion = "96.0.4664.45";
             profileInfo.UserAgent = $"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{profileInfo.BrowseVersion} Safari/537.36";
             profileInfo.Timezone = "Asia/Bangkok";
 
@@ -62,8 +65,11 @@ namespace SampleGPMBrowserAPI_MultiThread
             profileInfo.MaxVertexUniform = _rand.Next(3000, 4500);
             profileInfo.MaxFragmentUniform = _rand.Next(900, 1500);
 
+            profileInfo.CustomFlags.Add("--enabled");
+
             profileInfo.WebRTC.Mode = WebRTCMode.Real;
-            //profileInfo.Proxy = "103.155.217.247:32865"; // "socks5://1.2.3.4:567"
+            //profileInfo.Proxy = "socks5://1.2.3.4:567"; //"103.155.217.247:32865"; // 
+
             // Step 2: Set key GPM
             profileInfo.GPMKey = "Enter code here";
 
@@ -75,14 +81,12 @@ namespace SampleGPMBrowserAPI_MultiThread
             // Step 3: Init profile folder, path to chrome.exe and port remote chrome
             string gpmBrowserPath = @"D:\Codes\chromium\src\out\Release\chrome.exe"; //https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing
 
-            // Step 4: Start browser and remote
-            ChromeDriver driver = GPMLogin.GPMStarter.StartProfile(gpmBrowserPath, profilePath, portRemote, profileInfo,
-                // custom config
-                customFlags: new List<string>() { "--enabled" },
-                hideConsole: false,
-                extensions: null,
-                startUrl: "http://codethuegiare.com/" // Prevent open 2 tab at first startup
-                );
+            // Step 3: Start browser and remote
+            ChromeDriver driver = GPMLogin.GPMStarter.StartProfile(gpmBrowserPath, profileInfo,
+                 // custom config
+                 hideConsole: false,
+                 startUrl: "http://codethuegiare.com/" // Prevent open 2 tab at first startup
+                 );
 
             driver.Navigate().GoToUrl("http://codethuegiare.com/download");
 
