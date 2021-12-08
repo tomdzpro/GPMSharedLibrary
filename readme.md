@@ -13,10 +13,13 @@ Use:
 Random _rand = new Random();
 ProfileInfo profileInfo = new ProfileInfo();
 
-profileInfo.Name = "Ronin-Facebook";
-profileInfo.ConfigName = "ronin";
+profileInfo.ProfilePath = @"D:\Codes\chromium-test-file\profiles\test-profile";
+profileInfo.RemotePort = 9001;
 
-profileInfo.BrowseVersion = "93.0.4577.100";
+profileInfo.Name = "Test profile";
+profileInfo.ConfigName = "test";
+
+profileInfo.BrowseVersion = "96.0.4664.45";
 profileInfo.UserAgent = $"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{profileInfo.BrowseVersion} Safari/537.36";
 profileInfo.Timezone = "Asia/Bangkok";
 
@@ -36,24 +39,33 @@ profileInfo.AudioNoise = _rand.NextDouble();
 profileInfo.MaxVertexUniform = _rand.Next(3000, 4500);
 profileInfo.MaxFragmentUniform = _rand.Next(900, 1500);
 
+profileInfo.CustomFlags.Add("--enabled");
+
 profileInfo.WebRTC.Mode = WebRTCMode.Real;
-//profileInfo.Proxy = "103.155.217.247:32865"; // "socks5://1.2.3.4:567"
+// profileInfo.Proxy = "socks5://1.2.3.4:567"; //"103.155.217.247:32865"; // 
+
 // Step 2: Set key GPM
-profileInfo.GPMKey = "Enter key here";
+profileInfo.GPMKey = "Enter code here";
 
 // Step 3: Init profile folder, path to chrome.exe and port remote chrome
 string gpmBrowserPath = @"D:\Codes\chromium\src\out\Release\chrome.exe"; //https://drive.google.com/drive/folders/1GTGsYsWPrDi0cAMXLo_esTgGZ-5jpc50?usp=sharing
-string profilePath = @"D:\Codes\chromium-test-file\profiles\test-ronin";
-int portRemote = 9951;
+
+/****************Use export cookie plugin (cookie will send to SimpleServer.cs). Guide: https://youtu.be/7zZjsfuZ7tQ ***********************/
+//GPMSimpleHttpServer simpleHttpServer = new GPMSimpleHttpServer(6699);
+//simpleHttpServer.StartAsync();
+
+//profileInfo.Id = "fixed id";
+//string extensionPath = profileInfo.CopyCookieExtension();
+//profileInfo.Extensions.Add(extensionPath);
+//var onlineStatus = ProfileConection.GetProfileStatus(profileInfo.Id);
+/**/
 
 // Step 4: Start browser and remote
-ChromeDriver driver = GPMLogin.GPMStarter.StartProfile(gpmBrowserPath, profilePath, portRemote, profileInfo,
-    // custom config
-    customFlags: new List<string>() { "--enabled" },
-    hideConsole: false,
-    extensions: null,
-    startUrl: "http://codethuegiare.com/" // Prevent open 2 tab at first startup
-    );
+ChromeDriver driver = GPMLogin.GPMStarter.StartProfile(gpmBrowserPath,  profileInfo,
+	// custom config
+	hideConsole: false,
+	startUrl: "http://codethuegiare.com/" // Prevent open 2 tab at first startup
+	);
 
 driver.Navigate().GoToUrl("http://codethuegiare.com/download");
 
@@ -63,6 +75,7 @@ input.SendKeys("ABC");
 driver.FindElement(By.XPath("//*[@id='btnGetLink']")).Click();
 
 Thread.Sleep(2000);
-driver.Close();
-driver.Quit();
+//driver.Close();
+//driver.Quit();
+Console.ReadLine();// Keep simple server live
 ```
